@@ -13,6 +13,7 @@ The play is designed to be as simple as possible, and should be considered only 
 - *k8s-cluster*, which executes all Kubernetes cluster tasks (executes on the master node)
 
 ## Features:
+All features are optional and can be toggled on/off depending on your requirements.
 
 - A Flannel overlay network (using default network 10.244.0.0/16 for pods)
 - A Metal-LB load balancer using L2 provisioning (configurable provisioning network)
