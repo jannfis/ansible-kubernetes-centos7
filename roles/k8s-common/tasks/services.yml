@@ -1,7 +1,4 @@
 ---
-- name: Include environment variables
-  include_vars: environment.yml
-
 - name: Ensure Docker is configured to use a proxy server
   block:
     - file:
