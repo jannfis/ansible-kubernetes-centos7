@@ -41,3 +41,15 @@ Additionally, if you intend to use the *glusterfs* feature, you must provide a d
 ## Configuration
 
 Most of the global configuration is done via hostgroup variables, in ```group_vars/kubernetes-cluster```. It will add a global dict object named ```kubernetes``` to your variables namespace, so don't use that name anywhere else when working with the configured hosts.
+
+### Configure worker nodes
+
+Additionally to the Ansible inventory set-up, the cluster's worker nodes need to be defined in ```kubernetes.cluster.worker_nodes```. You need to specify the FQDN and the (primary) IP addresses of the cluster nodes.
+
+### Feature toggles
+The following are boolean values that specify what features you want to be enabled during setup
+
+- ```kubernetes.cluster.feature_toggles.flannel``` defines whether you want a Flannel network setup in your cluster
+- ```kubernetes.cluster.feature_toggles.metallb``` defines whether you want a MetalLB setup in your cluster
+- ```kubernetes.cluster.feature_toggles.glusterfs``` defines whether you want a GlusterFS setup in your cluster with Heketi provisioning
+
