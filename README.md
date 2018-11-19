@@ -3,7 +3,9 @@ Ansible play for creating a bare-metal Kubernetes cluster on CentOS 7
 
 ## What's this?
 
-A collection of Ansible configuration to set up a single master, multi minion cluster on bare metal CentOS 7 (amd64) environments. Running this play, you will end up with a simple but fully working Kubernetes cluster. I have created this mainly for my own entertainment, so your mileage may vary. 
+A collection of Ansible configuration to set up a single master, multi minion cluster on bare metal CentOS 7 (amd64) environments. Running this play, you will end up with a simple but fully working Kubernetes cluster. I have created this mainly for my own entertainment, so your mileage may vary.
+
+The play is designed to be as simple as possible, and should be considered only a starting point. Do yourself a favour and do not use this to set up production clusters.
 
 ## Features:
 
