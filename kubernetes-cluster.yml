@@ -1,0 +1,37 @@
+---
+# ----------------------------------------------------------------------------
+# Play for setting up and maintaining Kubernetes cluster consisting of one
+# master node and multiple workers.
+#
+# - Common configuration for all nodes are in role docker-common
+# - Configuration for only the master are in role docker-master
+# - Configuration for the worker nodes are in role docker-worker
+#
+# The following hostgroups will be used:
+#
+# - kubernetes-cluster  (all cluster nodes)
+# - kubernetes-master   (master node(s))
+# - kubernetes-worker   (worker/minion nodes)
+#
+# ----------------------------------------------------------------------------
+
+- hosts: kubernetes-cluster
+  roles:
+    - k8s-common
+
+- hosts: kubernetes-master
+  roles:
+    - k8s-master
+
+- hosts: kubernetes-worker
+  roles:
+    - k8s-worker
+
+# At this point, we should have a working cluster. We can bootstrap all needed
+# services now.
+
+- hosts: kubernetes-master
+  become: yes
+  become_user: kube
+  roles:
+    - k8s-cluster

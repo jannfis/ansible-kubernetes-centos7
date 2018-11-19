@@ -1,0 +1,78 @@
+---
+- name: Ensure br_netfilter is loaded
+  modprobe:
+    name: br_netfilter
+    state: present
+
+- name: Ensure br_netfilter is loaded at boot time
+  lineinfile:
+    line: "br_netfilter"
+    path: /etc/modules-load.d/br_netfilter.conf
+    create: yes
+    owner: root
+    group: root
+    mode: 0644
+
+- name: ensure net.bridge.bridge-nf-call-ip6tables is set to 1
+  sysctl:
+    name: net.bridge.bridge-nf-call-ip6tables
+    value: 1
+    state: present
+
+- name: ensure net.bridge.bridge-nf-call-iptables is set to 1
+  sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: 1
+    state: present
+
+- name: Get swap status
+  command: /usr/sbin/swapon -s
+  register: swapstate
+
+- name: Turn off swap on all machines
+  command: /usr/sbin/swapoff -a
+  when: swapstate.stdout_lines > 0
+
+- name: Ensure swap is not mounted at boot-time
+  mount:
+    path: swap
+    state: absent
+
+- name: Ensure kube group exists on the target systen
+  group:
+    name: "{{ kubernetes.cluster.k8s_user.group }}"
+    gid: "{{ kubernetes.cluster.k8s_user.gid }}"
+
+- name: Ensure kube user exists on the target system
+  user:
+    name: "{{ kubernetes.cluster.k8s_user.username }}"
+    uid: "{{ kubernetes.cluster.k8s_user.uid }}"
+    group: "{{ kubernetes.cluster.k8s_user.group }}"
+    comment: Kubernetes administration user
+    shell: /bin/bash
+
+- name: Ensure .ssh directory in kube user directory exists
+  file:
+    path: "/home/{{ kubernetes.cluster.k8s_user.username }}/.ssh"
+    state: directory
+    owner: "{{ kubernetes.cluster.k8s_user.username }}"
+    group: "{{ kubernetes.cluster.k8s_user.group }}"
+    mode: 0700
+
+- name: Ensure descriptors directory in kube user directory exists
+  file:
+    path: "/home/{{ kubernetes.cluster.k8s_user.username }}/descriptors"
+    state: directory
+    owner: "{{ kubernetes.cluster.k8s_user.username }}"
+    group: "{{ kubernetes.cluster.k8s_user.group }}"
+    mode: 0700
+
+- name: Ensure public SSH key for kube user is deployed
+  lineinfile:
+    path: "/home/{{ kubernetes.cluster.k8s_user.username }}/.ssh/authorized_keys"
+    create: yes
+    owner: "{{ kubernetes.cluster.k8s_user.username }}"
+    group: "{{ kubernetes.cluster.k8s_user.group }}"
+    mode: 0600
+    line: "{{ kubernetes.cluster.k8s_user.ssh_key }}"
+

@@ -1,0 +1,44 @@
+# vim: filetype=yaml
+---
+kubernetes:
+  cluster:
+    worker_nodes:
+      - name: k8s-node-001.example.com
+        addr: 192.168.0.1
+      - name: k8s-node-002.example.com
+        addr: 192.168.0.2
+      - name: k8s-node-003.example.com
+        addr: 192.168.0.3
+
+    feature_toggles:
+      flannel: yes
+      metallb: yes
+      glusterfs: yes
+
+    k8s_user:
+      username: kube
+      group: kube
+      uid: 1000
+      gid: 1000
+      ssh_key: <INSERT_YOUR_OPENSSH_PUBLIC_KEY_HERE>
+
+  docker:
+    logdriver: journald
+    # If you require HTTP proxy for Kubernetes, insert the URL below.
+    http_proxy: <INSERT_HTTP_PROXY_URL_OR_SET_TO_FALSE>
+
+  options:
+    reconfigure_rsyslog: yes
+
+  features:
+    flannel_network:
+      network: 10.244.0.0/16
+
+    metallb:
+      namespace: metallb-system
+      network: 10.1.0.0/24
+
+    glusterfs:
+      namespace: gluster-system
+      device: <PLEASE_SPECIFY>
+

@@ -1,0 +1,10 @@
+- name: handler_restart_docker
+  service:
+    name: docker
+    state: restarted
+  when: "docker_started is not changed"
+
+- name: handler_restart_rsyslog
+  service:
+    name: rsyslog
+    state: restarted

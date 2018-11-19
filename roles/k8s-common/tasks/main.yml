@@ -1,0 +1,21 @@
+---
+- name: Clean up Kubernetes cluster
+  import_tasks: cleanup.yml
+  when: "kubernetes_cleanup is defined"
+  tags:
+    - cleanup
+
+- name: Run all package related tasks
+  import_tasks: packages.yml
+  tags:
+    - packages
+
+- name: Run all system related tasks
+  import_tasks: system.yml
+  tags:
+    - system
+
+- name: Run all services related tasks
+  import_tasks: services.yml
+  tags:
+    - services

@@ -1,0 +1,57 @@
+- name: Run kubeadm reset
+  command: kubeadm reset -f
+  ignore_errors: true
+
+- name: Ensure all services are stopped
+  service:
+    name: "{{ item }}"
+    state: stopped
+    enabled: false
+  with_items:
+    - docker
+    - kubelet
+  ignore_errors: true
+
+- name: Ensure all Kubernetes packages are deinstalled
+  yum:
+    name: [ docker, kubelet, kubectl, kubeadm ]
+    state: absent
+
+- name: Remove kube user
+  user:
+    name: kube
+    state: absent
+
+- name: Remove kube home directory
+  file:
+    path: /home/kube
+    state: absent
+
+- name: Remove kubernetes configuration directory
+  file:
+    path: /etc/kubernetes
+    state: absent
+
+- name: Unmount all overlays
+  command: umount -t overlay -a
+
+- name: Remove statefiles
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /root/cluster_initialized.txt
+    - /root/node_joined.txt
+    - /var/lib/docker
+    - /var/lib/dockershim
+    - /var/lib/etcd/*
+    - /var/lib/kubelet
+
+- name: Reload systemctl daemon
+  command: systemctl daemon-reload
+
+- name: Reboot system
+  reboot:
+    post_reboot_delay: 30
+  when: reboot is defined
+

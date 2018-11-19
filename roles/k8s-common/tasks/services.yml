@@ -1,0 +1,82 @@
+---
+- name: Include environment variables
+  include_vars: environment.yml
+
+- name: Ensure Docker is configured to use a proxy server
+  block:
+    - file:
+        path: /etc/systemd/system/docker.service.d
+        state: directory
+        mode: 0755
+    - blockinfile:
+        path: /etc/systemd/system/docker.service.d/http-proxy.conf
+        block: |
+          [Service]
+          Environment="HTTP_PROXY={{ kunbernetes.docker.http_proxy }}" "HTTPS_PROXY={{ kubernetes.docker.http_proxy }}"
+        owner: root
+        group: root
+        mode: 0644
+        create: yes
+      register: handler_restart_docker
+  when: kubernetes.docker.http_proxy
+
+- name: Ensure system.conf.d exists
+  file:
+    path: /etc/systemd/system.conf.d
+    owner: root
+    group: root
+    state: directory
+
+- name: Ensure CPU and Memory accounting is enabled
+  blockinfile:
+    path: /etc/systemd/system.conf.d/10-kubernetes-accounting.conf
+    block: |
+      [Manager]
+      DefaultCPUAccounting=yes
+      DefaultMemoryAccounting=yes  
+    owner: root
+    group: root
+    mode: 0644
+    create: yes
+
+- name: Ensure Docker logging is correctly configured
+  lineinfile:
+    path: /etc/sysconfig/docker
+    regexp: '^OPTIONS=.*'
+    line: "OPTIONS='--selinux-enabled --log-driver={{ kubernetes.docker.logdriver }} --signature-verification=false'"
+    state: present
+  notify: handler_restart_docker
+
+- name: Ensure rsyslogd is correctly configured
+  copy:
+    src: etc/rsyslog.conf
+    dest: /etc/rsyslog.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: handler_restart_rsyslog
+  when: options.reconfigure_syslog is true
+
+- name: Ensure Docker log file exists
+  file:
+    path: /var/log/docker
+    state: touch
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Reload systemctl daemon
+  command: systemctl daemon-reload
+
+- name: Ensure Docker is started & enabled at boot-time
+  service:
+    name: docker
+    enabled: yes
+    state: started
+  register: docker_started
+
+- name: Ensure Kubelet is started & enabled at boot-time
+  service:
+    name: kubelet
+    enabled: yes
+    state: started

@@ -1,0 +1,30 @@
+---
+- name: Ensure that Kubernets GPG keys are installed
+  copy:
+    src: "security/{{ item }}"
+    dest: "/etc/yum/{{ item }}"
+    owner: root
+    group: root
+    mode: 0640
+  with_items:
+    - kubernetes-yum-key.gpg
+    - kubernetes-rpm-package-key.gpg
+
+- name: Ensure Kubernetes' YUM repository is configured
+  yum_repository:
+    name: Kubernetes
+    description: Kubernetes YUM repository
+    baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+    gpgkey: file:///etc/yum/kubernetes-yum-key.gpg file:///etc/yum/kubernetes-rpm-package-key.gpg
+    gpgcheck: yes
+
+- name: Ensure that GlusterFS repository is configured
+  yum:
+    name: centos-release-gluster41
+    state: installed
+
+- name: Ensure all common packages are installed
+  yum:
+    name: [ docker, kubelet, kubeadm, glusterfs-server ]
+    state: installed
+
