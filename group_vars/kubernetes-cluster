@@ -31,7 +31,7 @@ kubernetes:
     reconfigure_rsyslog: yes
 
   features:
-    flannel_network:
+    flannel:
       network: 10.244.0.0/16
 
     metallb:
