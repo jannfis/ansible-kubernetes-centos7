@@ -19,12 +19,17 @@
 
 - name: Remove kube user
   user:
-    name: kube
+    name: "{{ kubernetes.cluster.k8s_user.username }}"
+    state: absent
+
+- name: Remove kube group
+  group:
+    name: "{{ kubernetes.cluster.k8s_user.group }}"
     state: absent
 
 - name: Remove kube home directory
   file:
-    path: /home/kube
+    path: "/home/{{ kubernetes.cluster.k8s_user.username }}"
     state: absent
 
 - name: Remove kubernetes configuration directory
@@ -35,7 +40,7 @@
 - name: Unmount all overlays
   command: umount -t overlay -a
 
-- name: Remove statefiles
+- name: Remove state files and all Kubernetes runtime directories
   file:
     path: "{{ item }}"
     state: absent
