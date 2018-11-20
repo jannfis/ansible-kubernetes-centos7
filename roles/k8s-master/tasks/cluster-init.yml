@@ -18,7 +18,7 @@
 - name: Copy admin.conf to kube user
   copy:
     src: /etc/kubernetes/admin.conf
-    dest: /home/kube/.kube/config
+    dest: "/home/{{ kubernetes.cluster.k8s_user.username }}/.kube/config"
     remote_src: yes
     owner: kube
 
