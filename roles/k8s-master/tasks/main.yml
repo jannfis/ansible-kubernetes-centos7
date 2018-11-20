@@ -1,0 +1,4 @@
+- name: Initialize Kubernetes cluster
+  import_tasks: cluster-init.yml
+  tags:
+    - cluster

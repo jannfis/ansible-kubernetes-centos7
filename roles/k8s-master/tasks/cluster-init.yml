@@ -1,0 +1,56 @@
+- name: Run kubeadm for initialization
+  shell: |
+    kubeadm init \
+      --pod-network-cidr={{ kubernetes.features.flannel.network }} \
+      >> cluster_initialized.txt
+  args:
+    chdir: $HOME
+    creates: cluster_initialized.txt
+
+- name: Create .kube directory for kube user
+  become: yes
+  become_user: "{{ kubernetes.cluster.k8s_user.username }}"
+  file:
+    path: $HOME/.kube
+    state: directory
+    mode: 0755
+
+- name: Copy admin.conf to kube user
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /home/kube/.kube/config
+    remote_src: yes
+    owner: kube
+
+- name: Ensure descriptors directory exists on master node
+  become: yes
+  become_user: "{{ kubernetes.cluster.k8s_user.username }}"
+  file:
+    path: $HOME/descriptors/flannel
+    state: directory
+    mode: 0700
+
+- name: Copy Kubernetes flannel config to master node
+  become: yes
+  become_user: "{{ kubernetes.cluster.k8s_user.username }}"
+  template:
+    src: descriptors/flannel/kube-flannel.yml
+    dest: $HOME/descriptors/flannel/kube-flannel.yml
+
+- name: Initialize Kubernetes flannel network config
+  become: yes
+  become_user: "{{ kubernetes.cluster.k8s_user.username }}"
+  shell: kubectl apply -f $HOME/descriptors/flannel/kube-flannel.yml >> pod_network_setup.txt
+  args:
+    chdir: $HOME
+    creates: pod_network_setup.txt
+
+- name: Get cluster join command
+  become: yes
+  become_user: "{{ kubernetes.cluster.k8s_user.username }}"
+  shell: kubeadm token create --print-join-command
+  register: kube_join_command_raw
+
+- name: Publish cluster join command
+  set_fact:
+    join_command: "{{ kube_join_command_raw.stdout_lines[0] }}"
