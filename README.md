@@ -14,6 +14,13 @@ The play is designed to be as simple as possible, and should be considered only 
 
 It started out from the tutorial at https://www.digitalocean.com/community/tutorials/how-to-create-a-kubernetes-1-10-cluster-using-kubeadm-on-centos-7
 
+## How to use it
+
+1. Clone the repository to your Ansible master node
+2. Adapt configuration to your environment (in ```group_vars/kubernetes-cluster```, see below)
+3. Create (or adapt) Ansible inventory information (see below)
+4. Run ```ansible-playbook``` to execute ```kubernetes-cluster.yml```. The tasks require super user privileges on the remote hosts
+
 ## Features:
 All features are optional and can be toggled on/off depending on your requirements.
 
