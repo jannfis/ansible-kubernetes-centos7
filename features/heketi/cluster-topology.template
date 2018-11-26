@@ -1,0 +1,33 @@
+{
+  "clusters": [
+    {
+      "nodes": [
+{% for node in kubernetes.cluster.worker_nodes %}
+        {
+          "node": {
+            "hostnames": {
+              "manage": [
+                "{{ node.name }}"
+              ],
+              "storage": [
+                "{{ node.addr }}"
+              ]
+            },
+            "zone": 1
+          },
+          "devices": [
+            {
+              "name": "{{ kubernetes.features.glusterfs.device }}",
+              "destroydata": false
+            }
+          ]
+        }
+{% if not loop.last %}
+        ,
+{% endif %}
+{% endfor %}
+      ]
+    }
+  ]
+}
+
