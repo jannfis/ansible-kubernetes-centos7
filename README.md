@@ -12,6 +12,8 @@ The play is designed to be as simple as possible, and should be considered only 
 - *k8s-worker*, which executes all system relevant tasks on each cluster worker node
 - *k8s-cluster*, which executes all Kubernetes cluster tasks (executes on the master node)
 
+It started out from the tutorial at https://www.digitalocean.com/community/tutorials/how-to-create-a-kubernetes-1-10-cluster-using-kubeadm-on-centos-7
+
 ## Features:
 All features are optional and can be toggled on/off depending on your requirements.
 
