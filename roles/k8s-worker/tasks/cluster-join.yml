@@ -1,10 +1,10 @@
-- name:
-  set_fact:
-    join_command: "{{ hostvars[kubernetes.cluster.master_node.name].join_command }}"
-  when: 
-    - "join_command is not defined"
-    - "hostvars[kubernetes.cluster.master_node.name].join_command is defined"
-    
+- name: Get cluster join command
+  become: yes
+  become_user: "{{ kubernetes.cluster.k8s_user.username }}"
+  shell: kubeadm token create --print-join-command
+  register: kube_join_command_raw
+  delegate_to: "{{ kubernetes.cluster.master_node.name }}"
+
 - name: Join the node to the cluster
   shell: "{{ join_command }} >> node_joined.txt"
   args:
