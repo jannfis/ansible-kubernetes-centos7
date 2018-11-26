@@ -1,0 +1,10 @@
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+-N HEKETI
+-A HEKETI -p tcp -m state --state NEW -m tcp --dport 24007 -j ACCEPT
+-A HEKETI -p tcp -m state --state NEW -m tcp --dport 24008 -j ACCEPT
+-A HEKETI -p tcp -m state --state NEW -m tcp --dport 2222 -j ACCEPT
+-A HEKETI -p tcp -m state --state NEW -m multiport --dports 49152:49251 -j ACCEPT
+COMMIT

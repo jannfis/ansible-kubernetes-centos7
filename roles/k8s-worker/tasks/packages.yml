@@ -1,0 +1,4 @@
+- name: Ensure iptables-services package is installed
+  yum:
+    name: iptables-services
+    state: installed

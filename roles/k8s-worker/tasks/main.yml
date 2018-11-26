@@ -1,0 +1,18 @@
+- name: Execute all package related tasks
+  import_tasks: packages.yml
+  tags:
+    - k8s-worker
+    - packages 
+
+- name: Execute all iptables related tasks
+  import_tasks: iptables.yml
+  tags:
+    - k8s-worker
+  when:
+    - kubernetes.cluster.feature_toggles.glusterfs
+
+- name: Join worker node to cluster
+  import_tasks: cluster-join.yml
+  tags:
+    - k8s-worker
+    - cluster

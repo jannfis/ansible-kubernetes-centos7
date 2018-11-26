@@ -1,0 +1,14 @@
+- name: Ensure IPTables service is configured correctly
+  copy:
+    src: etc/sysconfig/iptables
+    dest: /etc/sysconfig/iptables
+    owner: root
+    group: root
+    mode: 0600
+  notify: handler_restart_iptables
+
+- name: Ensure IPTables service is enabled & started at boot time
+  service:
+    name: iptables
+    state: started
+    enabled: yes
