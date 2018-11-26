@@ -18,9 +18,9 @@ It started out from the tutorial at https://www.digitalocean.com/community/tutor
 
 All features are optional and can be toggled on/off depending on your requirements.
 
-- A Flannel overlay network (using default network 10.244.0.0/16 for pods)
-- A Metal-LB load balancer using L2 provisioning (configurable provisioning network)
-- GlusterFS setup with heketi for automatic provisioning of volumes (requires dedicated storage)
+- A [Flannel](https://github.com/coreos/flannel) overlay network (using default network 10.244.0.0/16 for pods)
+- A [MetalLB](https://metallb.universe.tf/) load balancer using L2 provisioning (configurable provisioning network)
+- A [GlusterFS](https://www.gluster.org/) setup using [Heketi](https://github.com/heketi/heketi) for automatic provisioning of volumes (requires a dedicated partition on each worker node for storage)
 
 ## How to use it
 
