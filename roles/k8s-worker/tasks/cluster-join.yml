@@ -1,9 +1,9 @@
 - name:
   set_fact:
-    join_command: "{{ hostvars['k8s-master.core.mistrust.net'].join_command }}"
+    join_command: "{{ hostvars[kubernetes.cluster.master_node.name].join_command }}"
   when: 
     - "join_command is not defined"
-    - "hostvars['k8s-master.core.mistrust.net'].join_command is defined"
+    - "hostvars[kubernetes.cluster.master_node.name].join_command is defined"
     
 - name: Join the node to the cluster
   shell: "{{ join_command }} >> node_joined.txt"
