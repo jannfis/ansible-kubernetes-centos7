@@ -14,6 +14,14 @@ The play is designed to be as simple as possible, and should be considered only 
 
 It started out from the tutorial at https://www.digitalocean.com/community/tutorials/how-to-create-a-kubernetes-1-10-cluster-using-kubeadm-on-centos-7
 
+## Features:
+
+All features are optional and can be toggled on/off depending on your requirements.
+
+- A Flannel overlay network (using default network 10.244.0.0/16 for pods)
+- A Metal-LB load balancer using L2 provisioning (configurable provisioning network)
+- GlusterFS setup with heketi for automatic provisioning of volumes (requires dedicated storage)
+
 ## How to use it
 
 1. Clone the repository to your Ansible master node
@@ -29,13 +37,6 @@ If you want to deinstall Kubernetes from your nodes completely, you can do so by
 $ ansible-playbook -u root kubernetes-cluster.yml -e kubernetes_cleanup=true
 ```
 This will revert (almost) all changes done by the play and deinstall all Kubernetes components from the *master* and *worker* nodes.
-
-## Features:
-All features are optional and can be toggled on/off depending on your requirements.
-
-- A Flannel overlay network (using default network 10.244.0.0/16 for pods)
-- A Metal-LB load balancer using L2 provisioning (configurable provisioning network)
-- GlusterFS setup with heketi for automatic provisioning of volumes (requires dedicated storage)
 
 ## Pre-requisites
 
