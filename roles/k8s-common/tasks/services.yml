@@ -9,7 +9,7 @@
         path: /etc/systemd/system/docker.service.d/http-proxy.conf
         block: |
           [Service]
-          Environment="HTTP_PROXY={{ kunbernetes.docker.http_proxy }}" "HTTPS_PROXY={{ kubernetes.docker.http_proxy }}"
+          Environment="HTTP_PROXY={{ kubernetes.docker.http_proxy }}" "HTTPS_PROXY={{ kubernetes.docker.http_proxy }}"
         owner: root
         group: root
         mode: 0644
