@@ -48,7 +48,7 @@ Additionally, if you intend to use the *glusterfs* feature, you must provide a d
 
 ## Configuration
 
-Most of the global configuration is done via hostgroup variables, in ```group_vars/kubernetes-cluster```. It will add a global dict object named ```kubernetes``` to your variables namespace, so don't use that name anywhere else when working with the configured hosts.
+Most of the global configuration is done via hostgroup variables, in ```group_vars/kubernetes-cluster.example```. Rename this file to ```group_vars/kubernetes-cluster``` and edit it to reflect your desired setup. It will add a global dict object named ```kubernetes``` to your Ansible variables namespace, so don't use that name anywhere else when working with the configured hosts.
 
 ### Configure worker nodes
 
