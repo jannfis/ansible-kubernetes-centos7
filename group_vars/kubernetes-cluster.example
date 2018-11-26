@@ -2,13 +2,16 @@
 ---
 kubernetes:
   cluster:
+    master_node:
+      name: k8s-master.example.com
+      addr: 192.168.0.1
     worker_nodes:
       - name: k8s-node-001.example.com
-        addr: 192.168.0.1
-      - name: k8s-node-002.example.com
         addr: 192.168.0.2
-      - name: k8s-node-003.example.com
+      - name: k8s-node-002.example.com
         addr: 192.168.0.3
+      - name: k8s-node-003.example.com
+        addr: 192.168.0.4
 
     feature_toggles:
       flannel: yes
