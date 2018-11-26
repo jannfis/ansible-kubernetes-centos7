@@ -21,6 +21,15 @@ It started out from the tutorial at https://www.digitalocean.com/community/tutor
 3. Create (or adapt) Ansible inventory information (see below)
 4. Run ```ansible-playbook``` to execute ```kubernetes-cluster.yml```. The tasks require super user privileges on the remote hosts
 
+## Deinstallation
+
+If you want to deinstall Kubernetes from your nodes completely, you can do so by supplying the variable ```kubernetes_cleanup``` to the play's execution, e.g. as so:
+
+```
+$ ansible-playbook -u root kubernetes-cluster.yml -e kubernetes_cleanup=true
+```
+This will revert (almost) all changes done by the play and deinstall all Kubernetes components from the *master* and *worker* nodes.
+
 ## Features:
 All features are optional and can be toggled on/off depending on your requirements.
 
