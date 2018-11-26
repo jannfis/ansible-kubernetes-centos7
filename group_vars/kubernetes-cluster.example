@@ -39,7 +39,7 @@ kubernetes:
 
     metallb:
       namespace: metallb-system
-      network: 10.1.0.0/24
+      network: 10.1.0.1-10.1.0.254
 
     glusterfs:
       namespace: gluster-system
