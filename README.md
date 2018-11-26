@@ -1,5 +1,6 @@
 # ansible-kubernetes-centos7
-Ansible play for creating a bare-metal Kubernetes cluster on CentOS 7
+
+Ansible play for creating a bare-metal Kubernetes cluster on CentOS 7 from scratch.
 
 ## What's this?
 
