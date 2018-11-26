@@ -52,7 +52,7 @@
     group: root
     mode: 0644
   notify: handler_restart_rsyslog
-  when: options.reconfigure_syslog is true
+  when: kubernetes.options.reconfigure_rsyslog 
 
 - name: Ensure Docker log file exists
   file:
