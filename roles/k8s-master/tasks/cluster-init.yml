@@ -34,7 +34,7 @@
   become: yes
   become_user: "{{ kubernetes.cluster.k8s_user.username }}"
   template:
-    src: descriptors/flannel/kube-flannel.yml
+    src: features/flannel/kube-flannel.yml
     dest: $HOME/descriptors/flannel/kube-flannel.yml
 
 - name: Initialize Kubernetes flannel network config
