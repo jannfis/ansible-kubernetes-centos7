@@ -60,3 +60,38 @@
     post_reboot_delay: 30
   when: reboot is defined
 
+# Below tasks should be used very carefully. They are only enabled if Gluster
+# feature is turned on and cleanup_storage is true.
+
+- name: Figure out which VGs to remove
+  shell: "vgs --no-headings -S pv_name={{ kubernetes.features.glusterfs.device }} | awk '{ print $1 }'"
+  register: glusterfs_vg
+  when: 
+    - "kubernetes.cluster.feature_toggles.glusterfs"
+    - "'kubernetes-worker' in group_names"
+    - "cleanup_storage is defined"
+
+- name: Remove all Logical Volumes
+  command: "lvremove -f -y {{ item }}"
+  with_items:
+    - "{{ glusterfs_vg.stdout_lines }}"
+  when: 
+    - "kubernetes.cluster.feature_toggles.glusterfs"
+    - "'kubernetes-worker' in group_names"
+    - "cleanup_storage is defined"
+
+- name: Remove all Volume Groups
+  command: "vgremove -f -y {{ item }}"
+  with_items:
+    - "{{ glusterfs_vg.stdout_lines }}"
+  when: 
+    - "kubernetes.cluster.feature_toggles.glusterfs"
+    - "'kubernetes-worker' in group_names"
+    - "cleanup_storage is defined"
+
+- name: Remove Physical Volume
+  command: "pvremove -y {{ kubernetes.features.glusterfs.device }}"
+  when: 
+    - "kubernetes.cluster.feature_toggles.glusterfs"
+    - "'kubernetes-worker' in group_names"
+    - "cleanup_storage is defined"
