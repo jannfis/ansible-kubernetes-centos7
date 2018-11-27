@@ -84,6 +84,7 @@
   command: "vgremove -f -y {{ item }}"
   with_items:
     - "{{ glusterfs_vg.stdout_lines }}"
+  register: vgs_removed
   when: 
     - "kubernetes.cluster.feature_toggles.glusterfs"
     - "'kubernetes-worker' in group_names"
@@ -95,3 +96,4 @@
     - "kubernetes.cluster.feature_toggles.glusterfs"
     - "'kubernetes-worker' in group_names"
     - "cleanup_storage is defined"
+    - "vgs_removed is changed"
