@@ -39,6 +39,8 @@ $ ansible-playbook -u root kubernetes-cluster.yml -e kubernetes_cleanup=true
 ```
 This will revert (almost) all changes done by the play and deinstall all Kubernetes components from the *master* and *worker* nodes.
 
+**Attention:** By default, the play will continue with a re-installation after running the clean up tasks. If you just want to cleanup, tell Ansible to only execute tasks tagged ```cleanup```, e.g. by specifying ```--tags cleanup``` on the command line.
+
 ## Pre-requisites
 
 Before you begin, the following hostgroups must be defined in your Ansible inventory:
