@@ -2,13 +2,14 @@
   become: yes
   become_user: "{{ kubernetes.cluster.k8s_user.username }}"
   shell: kubeadm token create --print-join-command
-  register: kube_join_command_raw
+  register: kube_join_command
+  run_once: true
   delegate_to: "{{ kubernetes.cluster.master_node.name }}"
 
 - name: Join the node to the cluster
-  shell: "{{ join_command }} >> node_joined.txt"
+  shell: "{{ kube_join_command.stdout }} >> node_joined.txt"
   args:
     chdir: $HOME
     creates: node_joined.txt
   when: 
-    - "join_command is defined"
+    - "kube_join_command is defined"
