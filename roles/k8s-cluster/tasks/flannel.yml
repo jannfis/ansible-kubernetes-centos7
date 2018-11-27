@@ -1,0 +1,19 @@
+---
+
+- name: Ensure descriptors directory exists on master node
+  file:
+    path: $HOME/descriptors/flannel
+    state: directory
+    mode: 0700
+
+- name: Copy Kubernetes flannel config to master node
+  template:
+    src: features/flannel/kube-flannel.yml
+    dest: $HOME/descriptors/flannel/kube-flannel.yml
+
+- name: Initialize Kubernetes flannel network config
+  shell: kubectl apply -f $HOME/descriptors/flannel/kube-flannel.yml >> pod_network_setup.txt
+  args:
+    chdir: $HOME
+    creates: pod_network_setup.txt
+
