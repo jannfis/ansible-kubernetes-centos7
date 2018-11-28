@@ -1,0 +1,15 @@
+---
+- name: Install Python pip
+  yum:
+    name: python2-pip
+    state: installed
+
+- name: Upgrade Python setuptools
+  pip:
+    name: setuptools
+    state: latest
+
+- name: Install Python openshift package
+  pip:
+    name: openshift
+    state: present
