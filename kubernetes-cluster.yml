@@ -1,6 +1,6 @@
 ---
 # ----------------------------------------------------------------------------
-# Play for setting up and maintaining Kubernetes cluster consisting of one
+# Plays for setting up and maintaining Kubernetes cluster consisting of one
 # master node and multiple workers.
 #
 # - Common configuration for all nodes are in role docker-common
@@ -35,3 +35,4 @@
   become_user: kube
   roles:
     - k8s-cluster
+
