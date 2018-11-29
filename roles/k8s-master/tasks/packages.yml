@@ -8,8 +8,14 @@
   pip:
     name: setuptools
     state: latest
+  environment:
+    http_proxy: "{{ kubernetes.docker.http_proxy | default('') }}"
+    https_proxy: "{{ kubernetes.docker.http_proxy | default('') }}"
 
 - name: Install Python openshift package
   pip:
     name: openshift
     state: present
+  environment:
+    http_proxy: "{{ kubernetes.docker.http_proxy | default('') }}"
+    https_proxy: "{{ kubernetes.docker.http_proxy | default('') }}"
