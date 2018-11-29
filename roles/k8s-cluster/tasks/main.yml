@@ -1,9 +1,9 @@
 ---
-- name: Include Flannel networking tasks
-  import_tasks: flannel.yml
+- name: Include MetalLB setup tasks
+  import_tasks: metallb.yml
   when:
-    - "kubernetes.cluster.feature_toggles.flannel"
+    - "kubernetes.cluster.feature_toggles.metallb"
   tags:
     - cluster
     - features
-    - flannel
+    - metallb
