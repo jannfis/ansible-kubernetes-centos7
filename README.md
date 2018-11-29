@@ -90,3 +90,6 @@ Some important things to keep in mind:
 2. Heketi is not set up for authentication, so basically everyone with HTTPS access to the API endpoint 
 3. All certificates in use are self-signed during the setup by kubeadm, you might want to replace them with your own certificates
 4. The GlusterFS setup is very default and nil (nada, zil) tuned nor tested
+
+## Feedback, suggestions, pull requests
+Yes.
