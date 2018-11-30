@@ -1,0 +1,30 @@
+---
+- name: Ensure MetalLB descriptor target directory exists
+  file:
+    path: $HOME/descriptors/metallb
+    state: directory
+    mode: 0700
+
+- name: Copy all MetalLB descriptor files
+  template:
+    src: "{{ item }}"
+    dest: $HOME/descriptors/metallb
+  with_fileglob: "features/metallb/*"
+
+- name: Create metallb-system namespace 
+  k8s:
+    name: "{{ kubernetes.features.metallb.namespace }}"
+    kind: Namespace
+    state: present
+
+- name: Create MetalLB ConfigMap
+  k8s:
+    state: present
+    namespace: "{{ kubernetes.features.metallb.namespace }}"
+    src: "$HOME/descriptors/metallb/metal-config.yaml"
+
+- name: Create MetalLB cluster objects
+  k8s:
+    state: present
+    namespace: "{{ kubernetes.features.metallb.namespace }}"
+    src: "$HOME/descriptors/metallb/metal-manifest.yaml"
