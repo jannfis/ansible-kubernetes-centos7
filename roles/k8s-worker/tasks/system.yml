@@ -1,0 +1,15 @@
+---
+- name: Ensure thin provisioning is configured at boot time
+  lineinfile:
+    path: /etc/modules.probe.d/02_dm_thin_pool.conf
+    line: dm-thin-pool
+    state: present
+    create: yes
+    owner: root
+    group: wheel
+    mode: 0644
+
+- name: Ensure thin provisioning is enabled
+  modprobe:
+    name: dm-thin-pool
+    state: present
