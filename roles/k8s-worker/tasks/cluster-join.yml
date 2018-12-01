@@ -6,10 +6,18 @@
   run_once: true
   delegate_to: "{{ kubernetes.cluster.master_node.name }}"
 
-- name: Join the node to the cluster
-  shell: "{{ kube_join_command.stdout }} >> node_joined.txt"
-  args:
-    chdir: $HOME
-    creates: node_joined.txt
-  when: 
-    - "kube_join_command is defined"
+- block: 
+  - name: Join the node to the cluster
+    shell: "{{ kube_join_command.stdout }} >> node_joined.txt"
+    args:
+      chdir: $HOME
+      creates: node_joined.txt
+    when: 
+      - "kube_join_command is defined"
+  rescue:
+  - name: Delete flag file
+    file:
+      path: $HOME/node_joined.txt
+      state: absent
+  - fail:
+      msg: "Could not join node to cluster"
