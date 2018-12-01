@@ -7,3 +7,12 @@
     - cluster
     - features
     - metallb
+
+- name: Include Heketi bootstrap setup tasks
+  import_tasks: heketi-bootstrap.yml
+  when:
+    - "kubernetes.cluster.feature_toggles.glusterfs"
+  tags:
+    - cluster
+    - features
+    - glusterfs

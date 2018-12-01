@@ -1,0 +1,174 @@
+- name: Ensure Heketi/GlusterFS descriptor target directory exists
+  file:
+    path: $HOME/descriptors/heketi
+    state: directory
+    mode: 0700
+
+- name: Copy all Heketi/GlusterFS descriptor files
+  template:
+    src: "{{ item }}"
+    dest: $HOME/descriptors/heketi
+  with_fileglob: "features/heketi/*"
+  tags:
+    - descriptors
+
+- name: Create heketi-system namespace
+  k8s:
+    name: "{{ kubernetes.features.glusterfs.namespace }}"
+    kind: Namespace
+    state: present
+
+- name: Check for presence of heketi.bootstraped
+  stat:
+    path: $HOME/heketi.bootstrapped
+  register: heketi_bootstrapped
+
+- name: Create GlusterFS daemonset
+  k8s:
+    namespace: "{{ kubernetes.features.glusterfs.namespace }}"
+    src: $HOME/descriptors/heketi/glusterfs-daemonset.json
+    state: present
+
+- name: Get all nodes already labeled as storage nodes
+  shell: "kubectl get nodes -l storagenode=glusterfs -o=custom-columns=NAME:.metadata.name | grep -v NAME"
+  register: storage_nodes
+  ignore_errors: true
+
+- name: Label all worker nodes as storage nodes
+  command: "kubectl label node {{ item }} storagenode=glusterfs"
+  with_items: "{{ kubernetes | json_query('cluster.worker_nodes[*].name') }}"
+  when: "item not in storage_nodes.stdout_lines"
+
+- name: Create Heketi ServiceAccount object
+  k8s:
+    namespace: "{{ kubernetes.features.glusterfs.namespace }}"
+    src: $HOME/descriptors/heketi/heketi-service-account.json
+    state: present
+
+- name: Create ClusterRoleBinding for Heketi
+  k8s:
+    state: present
+    namespace: "{{ kubernetes.features.glusterfs.namespace }}"
+    definition:
+      kind: ClusterRoleBinding
+      apiVersion: rbac.authorization.k8s.io/v1
+      metadata:
+        name: heketi-gluster-admin
+        namespace: "{{ kubernetes.features.glusterfs.namespace }}"
+      subjects:
+      - kind: ServiceAccount
+        name: heketi-service-account
+        namespace: "{{ kubernetes.features.glusterfs.namespace }}"
+      roleRef:
+        kind: ClusterRole
+        name: edit
+        apiGroup: rbac.authorization.k8s.io
+
+# I stumbled upon kind of a bug while creating a Secret with JSON in the data
+# section when using k8s module, so we use kubectl to create our Heketi secret
+# instead - for the time being.
+
+- name: Check whether heketi-config-secret already exists
+  shell: "kubectl get secrets -n {{ kubernetes.features.glusterfs.namespace }} -o=custom-columns=NAME:.metadata.name | grep -v NAME"
+  register: heketi_secrets
+  when: "not heketi_bootstrapped.stat.exists"
+
+- name: Create heketi-config-secret from heketi.json
+  command: "kubectl create secret generic heketi-config-secret --from-file=$HOME/descriptors/heketi/heketi.json -n {{ kubernetes.features.glusterfs.namespace }}"
+  when: 
+    - "not heketi_bootstrapped.stat.exists"
+    - "'heketi-config-secret' not in heketi_secrets.stdout_lines"
+
+- name: Create Heketi bootstrap deployment
+  k8s:
+    namespace: "{{ kubernetes.features.glusterfs.namespace }}"
+    src: $HOME/descriptors/heketi/heketi-bootstrap.yaml
+    state: present 
+  when: "not heketi_bootstrapped.stat.exists"
+
+- name: Wait for Heketi pod to be ready (300s timeout)
+  shell: "/usr/bin/kubectl get pods -n {{ kubernetes.features.glusterfs.namespace }} -l deploy-heketi=pod | awk '{ print $2 \" \" $3 }' | grep -v STATUS"
+  register: heketi_pods
+  until: "heketi_pods.stdout == '1/1 Running'"
+  delay: 20
+  retries: 15
+  when: "not heketi_bootstrapped.stat.exists"
+
+- block:
+  - name: Load the GlusterFS topology into Heketi using heketi-cli
+    shell: "/usr/bin/heketi-cli topology load --json=$HOME/descriptors/heketi/cluster-topology.template > $HOME/heketi-topology.loaded"
+    environment:
+      HEKETI_CLI_SERVER: "http://{{ kubernetes.features.glusterfs.heketi_endpoint_clusterip }}:8080"
+    args:
+      chdir: $HOME
+      creates: heketi-topology.loaded
+    register: heketi_topology
+  rescue:
+  - file:
+      path: $HOME/heketi-topology.loaded
+      state: absent
+  - fail:
+      msg: "Topology could not be loaded correctly."
+
+- name: Wait a few seconds for GlusterFS topology to settle
+  pause:
+    seconds: 60
+  when: heketi_topology is changed
+
+- block:
+  - name: Initialize OpenShift persistant storage on the GlusterFS cluster
+    shell: "/usr/bin/heketi-cli setup-openshift-heketi-storage"
+    environment:
+      HEKETI_CLI_SERVER: "http://{{ kubernetes.features.glusterfs.heketi_endpoint_clusterip }}:8080"
+    args:
+      chdir: $HOME
+      creates: heketi-storage.json
+  rescue:
+  - file:
+      path: $HOME/heketi-storage.json
+      state: absent
+  - fail:
+      msg: "OpenShift storage could not be initialized."
+
+- block:
+  - name: Create Heketi persistent storage 
+    shell: "/usr/bin/kubectl -n {{ kubernetes.features.glusterfs.namespace }} create -f $HOME/heketi-storage.json > heketi-storage.created"
+    register: heketi_storage_created
+    args:
+      chdir: $HOME
+      creates: heketi-storage.created
+  rescue:
+  - file:
+      path: $HOME/heketi-storage.created
+      state: absent
+  - fail:
+      msg: "Heketi Storage could not be setup correctly."
+
+- name: Wait for Heketi copy job to finish (100s timeout)
+  shell: "/usr/bin/kubectl -n heketi-system get jobs heketi-storage-copy-job | grep -v NAME | awk '{ print $2 }'"
+  register: heketi_copy_jobs
+  until: "heketi_copy_jobs.stdout == '1/1'"
+  delay: 20
+  retries: 5
+  when: "heketi_storage_created is changed"
+
+- name: Mark state as bootstrapped
+  lineinfile:
+    path: $HOME/heketi.bootstrapped
+    create: yes
+    mode: 0600
+    line: true
+  register: heketi_bootstrap_state
+
+- name: Clean up Heketi bootstrapping objects
+  shell: "kubectl delete all,service,jobs,deployment,secret --selector=\"deploy-heketi\" -n {{ kubernetes.features.glusterfs.namespace }}"
+  when: 
+    - "heketi_bootstrap_state is changed"
+    - "not heketi_bootstrapped.stat.exists"
+
+- name: Create the final Heketi deployment
+  k8s:
+    state: present
+    src: $HOME/descriptors/heketi/heketi-deployment.yaml
+    namespace: "{{ kubernetes.features.glusterfs.namespace }}"
+
