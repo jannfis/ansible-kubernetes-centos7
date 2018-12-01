@@ -42,6 +42,7 @@ kubernetes:
       network: 10.1.0.1-10.1.0.254
 
     glusterfs:
-      namespace: gluster-system
+      namespace: heketi-system
+      heketi_endpoint_clusterip: 10.97.0.1
       device: <PLEASE_SPECIFY>
 
