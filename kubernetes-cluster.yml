@@ -18,14 +18,17 @@
 - hosts: kubernetes-cluster
   roles:
     - k8s-common
+  any_errors_fatal: true
 
 - hosts: kubernetes-master
   roles:
     - k8s-master
+  any_errors_fatal: true
 
 - hosts: kubernetes-worker
   roles:
     - k8s-worker
+  any_errors_fatal: true
 
 # At this point, we should have a working cluster. We can bootstrap all needed
 # services now.
@@ -35,4 +38,5 @@
   become_user: kube
   roles:
     - k8s-cluster
+  any_errors_fatal: true
 
