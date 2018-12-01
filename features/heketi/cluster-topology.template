@@ -18,7 +18,7 @@
           "devices": [
             {
               "name": "{{ kubernetes.features.glusterfs.device }}",
-              "destroydata": false
+              "destroydata": true
             }
           ]
         }
