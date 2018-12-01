@@ -4,6 +4,12 @@
     - k8s-worker
     - packages 
 
+- name: Execute all system related tasks
+  import_tasks: system.yml
+  tags:
+    - k8s-worker
+    - system
+
 - name: Execute all iptables related tasks
   import_tasks: iptables.yml
   tags:
