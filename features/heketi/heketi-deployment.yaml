@@ -1,0 +1,94 @@
+---
+  apiVersion: v1
+  data: {}
+  kind: Secret
+  metadata:
+    labels:
+      glusterfs: heketi-db
+      heketi: db
+    name: heketi-db-backup
+  type: Opaque
+---
+  apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      description: Exposes Heketi Service
+    labels:
+      deploy-heketi: support
+      glusterfs: heketi-service
+    name: heketi
+  spec:
+    clusterIP: {{ kubernetes.features.glusterfs.heketi_endpoint_clusterip }}
+    ports:
+    - name: heketi
+      port: 8080
+      targetPort: 8080
+    selector:
+      name: heketi
+---
+  apiVersion: extensions/v1beta1
+  kind: Deployment
+  metadata:
+    annotations:
+      description: Defines how to deploy Heketi
+    labels:
+      glusterfs: heketi-deployment
+    name: heketi
+  spec:
+    replicas: 1
+    template:
+      metadata:
+        labels:
+          glusterfs: heketi-pod
+          name: heketi
+        name: heketi
+      spec:
+        containers:
+        - env:
+          - name: HEKETI_EXECUTOR
+            value: kubernetes
+          - name: HEKETI_DB_PATH
+            value: /var/lib/heketi/heketi.db
+          - name: HEKETI_FSTAB
+            value: /var/lib/heketi/fstab
+          - name: HEKETI_SNAPSHOT_LIMIT
+            value: '14'
+          - name: HEKETI_KUBE_GLUSTER_DAEMONSET
+            value: y
+          image: heketi/heketi:dev
+          imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /hello
+              port: 8080
+            initialDelaySeconds: 30
+            timeoutSeconds: 3
+          name: heketi
+          ports:
+          - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /hello
+              port: 8080
+            initialDelaySeconds: 3
+            timeoutSeconds: 3
+          volumeMounts:
+          - mountPath: /backupdb
+            name: heketi-db-secret
+          - mountPath: /var/lib/heketi
+            name: db
+          - mountPath: /etc/heketi
+            name: config
+        serviceAccountName: heketi-service-account
+        volumes:
+        - glusterfs:
+            endpoints: heketi-storage-endpoints
+            path: heketidbstorage
+          name: db
+        - name: heketi-db-secret
+          secret:
+            secretName: heketi-db-backup
+        - name: config
+          secret:
+            secretName: heketi-config-secret

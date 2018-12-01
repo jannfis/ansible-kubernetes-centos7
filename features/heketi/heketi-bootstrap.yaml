@@ -1,0 +1,78 @@
+---
+  apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      description: Exposes Heketi Service
+    labels:
+      deploy-heketi: support
+      glusterfs: heketi-service
+    name: deploy-heketi
+  spec:
+    clusterIP: "10.97.0.1"
+    ports:
+    - name: deploy-heketi
+      port: 8080
+      targetPort: 8080
+    selector:
+      name: deploy-heketi
+---
+  apiVersion: extensions/v1beta1
+  kind: Deployment
+  metadata:
+    annotations:
+      description: Defines how to deploy Heketi
+    labels:
+      deploy-heketi: deployment
+      glusterfs: heketi-deployment
+    name: deploy-heketi
+  spec:
+    replicas: 1
+    template:
+      metadata:
+        labels:
+          deploy-heketi: pod
+          glusterfs: heketi-pod
+          name: deploy-heketi
+        name: deploy-heketi
+      spec:
+        containers:
+        - env:
+          - name: HEKETI_EXECUTOR
+            value: kubernetes
+          - name: HEKETI_DB_PATH
+            value: /var/lib/heketi/heketi.db
+          - name: HEKETI_FSTAB
+            value: /var/lib/heketi/fstab
+          - name: HEKETI_SNAPSHOT_LIMIT
+            value: '14'
+          - name: HEKETI_KUBE_GLUSTER_DAEMONSET
+            value: y
+          image: heketi/heketi:dev
+          imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /hello
+              port: 8080
+            initialDelaySeconds: 30
+            timeoutSeconds: 3
+          name: deploy-heketi
+          ports:
+          - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /hello
+              port: 8080
+            initialDelaySeconds: 3
+            timeoutSeconds: 3
+          volumeMounts:
+          - mountPath: /var/lib/heketi
+            name: db
+          - mountPath: /etc/heketi
+            name: config
+        serviceAccountName: heketi-service-account
+        volumes:
+        - name: db
+        - name: config
+          secret:
+            secretName: heketi-config-secret
