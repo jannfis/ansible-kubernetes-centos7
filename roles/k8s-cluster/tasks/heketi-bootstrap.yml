@@ -64,6 +64,13 @@
         name: edit
         apiGroup: rbac.authorization.k8s.io
 
+- name: Wait for all glusterfs daemonset pods are running and ready (300s timeout)
+  shell: "kubectl get pods -n heketi-system -l glusterfs-node=daemonset | grep -v NAME | awk '{ print $2 }'"
+  register: gluster_daemonset
+  until: "'0/1' not in gluster_daemonset.stdout_lines"
+  delay: 20
+  retries: 15
+
 # I stumbled upon kind of a bug while creating a Secret with JSON in the data
 # section when using k8s module, so we use kubectl to create our Heketi secret
 # instead - for the time being.
