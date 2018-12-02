@@ -14,7 +14,7 @@
 
 - name: Ensure all Kubernetes packages are deinstalled
   yum:
-    name: [ docker, kubelet, kubectl, kubeadm ]
+    name: [ docker, kubelet, kubectl, kubeadm, glusterfs ]
     state: absent
 
 - name: Remove kube user
@@ -104,3 +104,10 @@
     - "kubernetes.cluster.feature_toggles.glusterfs"
     - "'kubernetes-worker' in group_names"
     - "cleanup_storage is defined"
+
+- name: Remove Gluster state directories
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /var/lib/glusterd
