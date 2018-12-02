@@ -97,3 +97,10 @@
     - "'kubernetes-worker' in group_names"
     - "cleanup_storage is defined"
     - "vgs_removed is changed"
+
+- name: Wipe all Filesystem information
+  command: "wipefs -a -f {{ kubernetes.features.glusterfs.device }}"
+  when:
+    - "kubernetes.cluster.feature_toggles.glusterfs"
+    - "'kubernetes-worker' in group_names"
+    - "cleanup_storage is defined"
