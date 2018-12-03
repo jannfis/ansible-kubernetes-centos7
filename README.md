@@ -81,6 +81,11 @@ The following are boolean values that specify what features you want to be enabl
 - ```kubernetes.cluster.feature_toggles.metallb``` defines whether you want a MetalLB setup in your cluster
 - ```kubernetes.cluster.feature_toggles.glusterfs``` defines whether you want a GlusterFS setup in your cluster with Heketi provisioning
 
+Each feature must then be configured individually in the ```kubernetes.features``` section.
+
+### Kubernetes user
+The plays require a non-privileged user for performing the Kubernetes cluster tasks. This user is configured in the ```kubernetes.cluster.k8s_user``` variable.
+
 ## Thinks to keep in mind / Caveats
 As mentioned above, the Kubernetes cluster set up by this play should not be used as-is for production purposes. 
 
