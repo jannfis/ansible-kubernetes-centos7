@@ -39,6 +39,8 @@ $ ansible-playbook -u root kubernetes-cluster.yml -e kubernetes_cleanup=true
 ```
 This will revert (almost) all changes done by the play and deinstall all Kubernetes components from the *master* and *worker* nodes. If you want the nodes to be rebooted after clean up, also use ```-e reboot=true``` as argument.
 
+If you also want to revert what the GlusterFS configuration did (i.e. clean up all storage), specify ```-e cleanup_storage=yes``` as well. Be careful! This will destroy **all** data and partitions on the block device you specified as ```kubernetes.features.glusterfs.device```.
+
 **Attention:** By default, the play will continue with a re-installation after running the clean up tasks. If you just want to cleanup, tell Ansible to only execute tasks tagged ```cleanup```, e.g. by specifying ```--tags cleanup``` on the command line.
 
 ## Pre-requisites
