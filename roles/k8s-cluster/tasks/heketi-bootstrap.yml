@@ -101,6 +101,11 @@
   retries: 15
   when: "not heketi_bootstrapped.stat.exists"
 
+- name: Wait an additional few seconds for Heketi service to be available
+  pause:
+    seconds: 10
+  when: "not heketi_bootstrapped.stat.exists"
+
 - block:
   - name: Load the GlusterFS topology into Heketi using heketi-cli
     shell: "/usr/bin/heketi-cli topology load --json=$HOME/descriptors/heketi/cluster-topology.template > $HOME/heketi-topology.loaded"
