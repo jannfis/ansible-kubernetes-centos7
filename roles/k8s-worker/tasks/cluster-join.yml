@@ -5,6 +5,8 @@
   register: kube_join_command
   run_once: true
   delegate_to: "{{ kubernetes.cluster.master_node.name }}"
+  tags:
+    - clusterjoin
 
 - block: 
   - name: Join the node to the cluster
@@ -14,6 +16,8 @@
       creates: node_joined.txt
     when: 
       - "kube_join_command is defined"
+    tags:
+      - clusterjoin
   rescue:
   - name: Delete flag file
     file:
