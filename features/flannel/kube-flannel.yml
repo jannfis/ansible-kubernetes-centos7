@@ -73,7 +73,7 @@ data:
     }
   net-conf.json: |
     {
-      "Network": "{{ kubernetes.features.flannel.network }}",
+      "Network": "{{ kubernetes.cluster.network.cidr }}",
       "Backend": {
         "Type": "vxlan"
       }

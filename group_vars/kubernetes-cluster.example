@@ -25,6 +25,10 @@ kubernetes:
       gid: 1000
       ssh_key: <INSERT_YOUR_OPENSSH_PUBLIC_KEY_HERE>
 
+    network:
+      type: flannel
+      cidr: 10.244.0.0/16
+
   docker:
     logdriver: journald
     # If you require HTTP proxy for Kubernetes, insert the URL below.
@@ -34,9 +38,6 @@ kubernetes:
     reconfigure_rsyslog: yes
 
   features:
-    flannel:
-      network: 10.244.0.0/16
-
     metallb:
       namespace: metallb-system
       network: 10.1.0.1-10.1.0.254

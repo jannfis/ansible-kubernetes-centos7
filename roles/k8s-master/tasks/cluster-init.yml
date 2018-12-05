@@ -1,11 +1,11 @@
 - name: Run kubeadm for initialization
   shell: |
     kubeadm init \
-      --pod-network-cidr={{ kubernetes.features.flannel.network }} \
-      >> cluster_initialized.txt
+      --pod-network-cidr={{ kubernetes.cluster.network.cidr }} \
+      >> cluster-phase1.initialized
   args:
     chdir: $HOME
-    creates: cluster_initialized.txt
+    creates: cluster-phase1.initialized
 
 - name: Create .kube directory for kube user
   become: yes
@@ -22,4 +22,15 @@
     remote_src: yes
     owner: kube
 
-
+#- name: Wait a few seconds for Kubernetes changes to propagate
+#  pause:
+#    seconds: 30
+#
+#- name: Wait for Cluster to be initialized fully (600s timeout)
+#  become: yes
+#  become_user: "{{ kubernetes.cluster.k8s_user.username }}"
+#  shell: "kubectl get pods -n kube-system -o=wide | grep -v NAME | awk '{ print $2 }'"
+#  register: kubernetes_initialized
+#  until: "'0/1' not in kubernetes_initialized.stdout_lines"
+#  delay: 20
+#  retries: 30
