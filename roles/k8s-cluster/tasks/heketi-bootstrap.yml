@@ -79,6 +79,7 @@
   shell: "kubectl get secrets -n {{ kubernetes.features.glusterfs.namespace }} -o=custom-columns=NAME:.metadata.name | grep -v NAME"
   register: heketi_secrets
   when: "not heketi_bootstrapped.stat.exists"
+  failed_when: "heketi_secrets.rc > 0 and heketi_secrets.stderr != ''"
 
 - name: Create heketi-config-secret from heketi.json
   command: "kubectl create secret generic heketi-config-secret --from-file=$HOME/descriptors/heketi/heketi.json -n {{ kubernetes.features.glusterfs.namespace }}"
