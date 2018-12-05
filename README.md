@@ -19,7 +19,10 @@ It started out from the tutorial at https://www.digitalocean.com/community/tutor
 
 All features are optional and can be toggled on/off depending on your requirements.
 
+**Supported CNI/networking modules:**
 - A [Flannel](https://github.com/coreos/flannel) overlay network (using default network 10.244.0.0/16 for pods)
+
+**Cluster features:**
 - A [MetalLB](https://metallb.universe.tf/) load balancer using L2 provisioning (configurable provisioning network)
 - A [GlusterFS](https://www.gluster.org/) setup using [Heketi](https://github.com/heketi/heketi) for automatic provisioning of volumes (requires a dedicated partition on each worker node for storage)
 
@@ -76,10 +79,13 @@ Most of the global configuration is done via hostgroup variables, in ```group_va
 
 Additionally to the Ansible inventory set-up, the cluster's worker nodes need to be defined in ```kubernetes.cluster.worker_nodes```. You need to specify the FQDN and the (primary) IP addresses of the cluster nodes.
 
+### CNI/networking configuration
+- Set ```kubernetes.cluster.network.type``` to your desired network overlay plugin (currently, only ```flannel``` is supported).
+- Set ```kubernetes.cluster.network.cidr``` to the overlay network you want to allocate addresses from for your pods
+
 ### Feature toggles
 The following are boolean values that specify what features you want to be enabled during setup
 
-- ```kubernetes.cluster.feature_toggles.flannel``` defines whether you want a Flannel network setup in your cluster
 - ```kubernetes.cluster.feature_toggles.metallb``` defines whether you want a MetalLB setup in your cluster
 - ```kubernetes.cluster.feature_toggles.glusterfs``` defines whether you want a GlusterFS setup in your cluster with Heketi provisioning
 
