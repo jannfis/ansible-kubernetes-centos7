@@ -20,4 +20,6 @@ Tested with Ansible 1.7
 Because it is the simplest network overlay. Maybe I'll replace it with a more
 advanced one like Calico soon to support network isolation.
 
+## What about Helm?
 
+Maybe with Helm v3 (and without tiller)
