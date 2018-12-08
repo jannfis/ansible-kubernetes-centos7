@@ -21,16 +21,27 @@
   user:
     name: "{{ kubernetes.cluster.k8s_user.username }}"
     state: absent
+  when: "kubernetes.cluster.k8s_user.managed"
 
 - name: Remove kube group
   group:
     name: "{{ kubernetes.cluster.k8s_user.group }}"
     state: absent
+  when: "kubernetes.cluster.k8s_user.managed"
+
+- name: Remove k8s-states directory from root and kubernets user
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "/root/.k8s-state"
+    - "{{ kubernetes.cluster.k8s_user.homedir }}/.k8s-state"
 
 - name: Remove kube home directory
   file:
     path: "/home/{{ kubernetes.cluster.k8s_user.username }}"
     state: absent
+  when: "kubernetes.cluster.k8s_user.managed"
 
 - name: Remove kubernetes configuration directory
   file:

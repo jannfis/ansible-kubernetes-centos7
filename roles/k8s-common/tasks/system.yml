@@ -42,6 +42,7 @@
   group:
     name: "{{ kubernetes.cluster.k8s_user.group }}"
     gid: "{{ kubernetes.cluster.k8s_user.gid }}"
+  when: "kubernetes.cluster.k8s_user.managed"
 
 - name: Ensure kube user exists on the target system
   user:
@@ -50,18 +51,28 @@
     group: "{{ kubernetes.cluster.k8s_user.group }}"
     comment: Kubernetes administration user
     shell: /bin/bash
+  when: "kubernetes.cluster.k8s_user.managed"
 
 - name: Ensure .ssh directory in kube user directory exists
   file:
-    path: "/home/{{ kubernetes.cluster.k8s_user.username }}/.ssh"
+    path: "{{ kubernetes.cluster.k8s_user.homedir }}/.ssh"
+    state: directory
+    owner: "{{ kubernetes.cluster.k8s_user.username }}"
+    group: "{{ kubernetes.cluster.k8s_user.group }}"
+    mode: 0700
+  when: "kubernetes.cluster.k8s_user.managed"
+
+- name: Ensure descriptors directory in kube user directory exists
+  file:
+    path: "{{ kubernetes.cluster.k8s_user.homedir }}/descriptors"
     state: directory
     owner: "{{ kubernetes.cluster.k8s_user.username }}"
     group: "{{ kubernetes.cluster.k8s_user.group }}"
     mode: 0700
 
-- name: Ensure descriptors directory in kube user directory exists
+- name: Ensure state directory in kube user directory exists
   file:
-    path: "/home/{{ kubernetes.cluster.k8s_user.username }}/descriptors"
+    path: "{{ kubernetes.cluster.k8s_user.homedir }}/.k8s-state"
     state: directory
     owner: "{{ kubernetes.cluster.k8s_user.username }}"
     group: "{{ kubernetes.cluster.k8s_user.group }}"
@@ -69,10 +80,11 @@
 
 - name: Ensure public SSH key for kube user is deployed
   lineinfile:
-    path: "/home/{{ kubernetes.cluster.k8s_user.username }}/.ssh/authorized_keys"
+    path: "{{ kubernetes.cluster.k8s_user.homedir }}/.ssh/authorized_keys"
     create: yes
     owner: "{{ kubernetes.cluster.k8s_user.username }}"
     group: "{{ kubernetes.cluster.k8s_user.group }}"
     mode: 0600
     line: "{{ kubernetes.cluster.k8s_user.ssh_key }}"
+  when: "kubernetes.cluster.k8s_user.managed"
 
