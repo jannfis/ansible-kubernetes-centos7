@@ -31,7 +31,7 @@
 
 - name: Turn off swap on all machines
   command: /usr/sbin/swapoff -a
-  when: swapstate.stdout_lines > 0
+  when: "swapstate.stdout != ''"
 
 - name: Ensure swap is not mounted at boot-time
   mount:
