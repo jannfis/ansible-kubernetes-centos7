@@ -69,6 +69,8 @@ kubernetes-worker
 ```
 Of course, all the nodes should already be bootstrapped (i.e. user account(s) set up, SSH keys deployed, etc.). These tasks are all beyond the scope of this play.
 
+All nodes configured above should be able to fetch stuff from the Internet via HTTPS, at least through a HTTP proxy server. Offline installations are not supported.
+
 Additionally, if you intend to use the *glusterfs* feature, you must provide a dedicated block device on all ```kubernetes-worker``` node. The name of this device should be similar on each node.
 
 ## Configuration
