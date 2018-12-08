@@ -184,4 +184,13 @@
     state: present
     src: $HOME/descriptors/heketi/heketi-deployment.yaml
     namespace: "{{ kubernetes.features.glusterfs.namespace }}"
+  register: heketi_deployment_created
+
+- name: Wait for Heketi deployment to be up & running (300s timeout)
+  shell: "kubectl get pods -n {{ kubernetes.features.glusterfs.namespace }} -l name=heketi | grep -v NAME | awk '{ print $2 \" \" $3 }'"
+  register: heketi_deployment
+  until: "heketi_deployment.stdout == '1/1 Running'"
+  delay: 20
+  retries: 15
+  when: "heketi_deployment_created is changed"
 
