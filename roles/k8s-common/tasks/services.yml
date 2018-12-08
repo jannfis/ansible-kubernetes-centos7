@@ -54,13 +54,20 @@
   notify: handler_restart_rsyslog
   when: kubernetes.options.reconfigure_rsyslog 
 
-- name: Ensure Docker log file exists
+- name: Check if Docker log file exists
+  stat:
+    path: /var/log/docker
+  register: docker_log_file
+
+- name: Create Docker log file
   file:
     path: /var/log/docker
     state: touch
     owner: root
     group: root
     mode: 0600
+  when: "not docker_log_file.stat.exists"
+  notify: handler_restart_rsyslog
 
 - name: Reload systemctl daemon
   command: systemctl daemon-reload
