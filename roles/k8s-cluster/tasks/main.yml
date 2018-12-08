@@ -16,3 +16,13 @@
     - cluster
     - features
     - glusterfs
+
+- name: Include additional Heketi configuration tasks
+  import_tasks: heketi-storageclass.yml
+  when:
+    - "kubernetes.cluster.feature_toggles.glusterfs"
+    - "kubernetes.features.glusterfs.storageclass_name is defined"
+  tags:
+    - cluster
+    - features
+    - glusterfs

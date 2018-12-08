@@ -1,0 +1,15 @@
+---
+# Provision a StorageClass into our cluster, so that Heketi can automatically
+# create PersistenVolumeClaims for applications.
+
+- name: Create default Heketi storage class
+  k8s:
+    kind: StorageClass
+    definition:
+      metadata:
+        name: "{{ kubernetes.features.glusterfs.storageclass_name }}"
+      provisioner: kubernetes.io/glusterfs
+      parameters:
+        resturl: "\"http://{{ kubernetes.features.glusterfs.heketi_endpoint_clusterip }}:8080\""
+        restuser: "joe"
+        restuserkey: "somekey"
