@@ -69,6 +69,8 @@ kubernetes-worker
 ```
 Of course, all the nodes should already be bootstrapped (i.e. user account(s) set up, SSH keys deployed, etc.). These tasks are all beyond the scope of this play.
 
+All nodes configured above should be able to fetch stuff from the Internet via HTTPS, at least through a HTTP proxy server. Offline installations are not supported.
+
 Additionally, if you intend to use the *glusterfs* feature, you must provide a dedicated block device on all ```kubernetes-worker``` node. The name of this device should be similar on each node.
 
 ## Configuration
@@ -92,7 +94,7 @@ The following are boolean values that specify what features you want to be enabl
 Each feature must then be configured individually in the ```kubernetes.features``` section.
 
 ### Kubernetes user
-The plays require a non-privileged user for performing the Kubernetes cluster tasks. This user is configured in the ```kubernetes.cluster.k8s_user``` variable.
+The plays require a non-privileged user for performing the Kubernetes cluster tasks. This user is configured in the ```kubernetes.cluster.k8s_user``` variable. This user can either be managed or unmanaged by this plays. In managed mode, the user and group will be created along with any supplemental configuration (like required SSH keys). Also, in *managed* mode this user will be deleted (along with its home directory!) from all nodes when running cleanup tasks. Likewise, in *unmanaged* mode, this plays will assume an already existing user on the nodes and will not touch it during cleanup.
 
 ## Thinks to keep in mind / Caveats
 As mentioned above, the Kubernetes cluster set up by this play should not be used as-is for production purposes. 
