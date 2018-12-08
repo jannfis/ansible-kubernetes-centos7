@@ -1,6 +1,18 @@
 # vim: filetype=yaml
 ---
+# All configuration is kept in the kubernetes dict object.
+#
 kubernetes:
+
+  # Define the overall layout of your cluster - it should consist of at least
+  # exactly one master node (multi-master setup is not supported) and one or
+  # more worker (minion) nodes.
+  #
+  # If you intend to setup GlusterFS, at least 3 worker nodes are required.
+  #
+  # Each node must be specified with FQDN (needs to be resolvable on all nodes)
+  # and its IP address.
+  #
   cluster:
     master_node:
       name: k8s-master.example.com
@@ -13,18 +25,35 @@ kubernetes:
       - name: k8s-node-003.example.com
         addr: 192.168.0.4
 
+    # Define the features you want to be setup. Use yes/no or true/false
+    #
     feature_toggles:
-      flannel: yes
       metallb: yes
       glusterfs: yes
 
+    # Which user account should be the Cluster admin? The properties username,
+    # group and homedir are mandatory in all cases. In case of managed account,
+    # also uid, gid and ssh_key must be specified.
+    #
+    # If you specify managed as true, the user will be created during playbook
+    # execution. Please note that in this case, the user will also be REMOVED
+    # when you run the playbook in cleanup mode, along with the home directory.
+    #
     k8s_user:
+      managed: yes
       username: kube
       group: kube
+      homedir: /home/kube
       uid: 1000
       gid: 1000
       ssh_key: <INSERT_YOUR_OPENSSH_PUBLIC_KEY_HERE>
 
+    # Exactly one network overlay must be specified, along with its required
+    # configuration properties. Currently, only overlays of type flannel are
+    # supported.
+    #
+    # The container network is specified using the "cidr" property.
+    #
     network:
       type: flannel
       cidr: 10.244.0.0/16
