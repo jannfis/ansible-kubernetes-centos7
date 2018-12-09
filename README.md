@@ -96,6 +96,14 @@ Each feature must then be configured individually in the ```kubernetes.features`
 ### Kubernetes user
 The plays require a non-privileged user for performing the Kubernetes cluster tasks. This user is configured in the ```kubernetes.cluster.k8s_user``` variable. This user can either be managed or unmanaged by this plays. In managed mode, the user and group will be created along with any supplemental configuration (like required SSH keys). Also, in *managed* mode this user will be deleted (along with its home directory!) from all nodes when running cleanup tasks. Likewise, in *unmanaged* mode, this plays will assume an already existing user on the nodes and will not touch it during cleanup.
 
+### Configure the storage cluster
+For the GlusterFS cluster to work, you need at least three worker nodes for your cluster. Each of the nodes must have a dedicated partition (or whole disk) available for Gluster to use, and they should ideally be of the same size on all nodes. All configurables are found in the ```kubernetes.features.glusterfs``` map:
+
+- ```namespace``` defines the namespace in your Kubernetes cluster to install the components
+- ```device``` is the name of the block device to use for clustered storage (must be same across all nodes!)
+- ```storageclass_name``` is optional, and if given, is the name of the StorageClass object created for automatic volume provisioning within the Kubernetes cluster
+- ```heketi_endpoint_clusterip``` defines the ClusterIP resource to allocate and bind the Heketi API to. This will be the endpoint you set ```HEKETI_CLI_SERVER``` to when talking with the API.
+
 ## Thinks to keep in mind / Caveats
 As mentioned above, the Kubernetes cluster set up by this play should not be used as-is for production purposes. 
 
