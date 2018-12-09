@@ -102,7 +102,7 @@ As mentioned above, the Kubernetes cluster set up by this play should not be use
 Some important things to keep in mind:
 
 1. Flannel does not provide any network isolation for your pods whatsoever (all pods can communicate with every other pod in the cluster)
-2. Heketi is not set up for authentication, so basically everyone with HTTPS access to the API endpoint 
+2. Heketi is not set up for authentication, so basically everyone with HTTP access to the API endpoint can perform actions on your storage cluster, up to deleting volumes and even the cluster it self.
 3. All certificates in use are self-signed during the setup by kubeadm, you might want to replace them with your own certificates
 4. The GlusterFS setup is very default and nil (nada, zil) tuned nor tested
 
