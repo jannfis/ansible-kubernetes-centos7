@@ -1,7 +1,7 @@
 ---
-- name: Install Python pip
+- name: Install required packages
   yum:
-    name: python2-pip
+    name: [ python2-pip, heketi-client ]
     state: installed
 
 - name: Upgrade Python setuptools
