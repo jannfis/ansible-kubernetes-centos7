@@ -20,11 +20,11 @@
 
 - name: Ensure that GlusterFS repository is configured
   yum:
-    name: centos-release-gluster41
+    name: centos-release-gluster6
     state: installed
 
 - name: Ensure all common packages are installed
   yum:
-    name: [ docker, kubelet, kubeadm, glusterfs-server ]
+    name: [ docker, kubelet, kubeadm, glusterfs, glusterfs-fuse ]
     state: installed
 
