@@ -117,7 +117,8 @@
       creates: heketi-topology.loaded
     register: heketi_topology
   rescue:
-  - file:
+  - name: Cleanup - Remove Heketi topology statefile
+    file:
       path: $HOME/heketi-topology.loaded
       state: absent
   - fail:
