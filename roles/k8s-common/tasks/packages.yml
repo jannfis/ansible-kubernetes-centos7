@@ -22,9 +22,17 @@
   yum:
     name: centos-release-gluster6
     state: installed
+  when: 
+    - "kubernetes.cluster.feature_toggles"
 
 - name: Ensure all common packages are installed
   yum:
     name: [ docker, kubelet, kubeadm, glusterfs, glusterfs-fuse ]
     state: installed
 
+- name: Ensure all GlusterFS feature related packages are installed
+  yum:
+    name: [ glusterfs, glusterfs-fuse ]
+    state: installed
+  when: 
+    - "kubernetes.cluster.feature_toggles"

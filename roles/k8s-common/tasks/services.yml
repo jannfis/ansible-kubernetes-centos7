@@ -84,3 +84,13 @@
     name: kubelet
     enabled: yes
     state: started
+
+- name: Ensure Portmap is disabled & stopped on the host nodes
+  service:
+    name: "{{ item }}"
+    state: stopped
+    enabled: no
+  with_items:
+    - rpcbind
+    - rpcbind.socket
+  ignore_errors: yes
